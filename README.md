@@ -11,11 +11,9 @@ Example manifest:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-    <project path="vendor/partner_gms" name="danielk43/android_vendor_partner_gms" remote="github" revision="main" />
+    <project path="vendor/additional_apps" name="Pugemon/los_additional_apps" remote="github" revision="main" />
 </manifest>
 ```
-
-Note: You do not need to set `CUSTOM_PACKAGES` for the packages to be included when building with [lineageos4microg/docker-lineage-cicd](https://github.com/lineageos4microg/docker-lineage-cicd).
 
 The included APKs are:
  * FDroid packages (binaries sourced from [here](https://f-droid.org/packages/org.fdroid.fdroid/) and [here](https://f-droid.org/packages/org.fdroid.fdroid.privileged/))
