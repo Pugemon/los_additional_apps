@@ -21,18 +21,21 @@ def _child_el_content(el: minidom.Element, tag_name: str):
 
 
 def fdroid_recommended_release(repo: str, application_id: str):
-    with requests_session.get('{}/index.xml'.format(repo)) as r:
+    with requests_session.get(f'{repo}/index.xml') as r:
         doc = pulldom.parseString(r.text)
         for event, node in doc:
-            if event == pulldom.START_ELEMENT and node.tagName == 'application':
-                if node.getAttribute('id') == application_id:
-                    doc.expandNode(node)
-                    marketvercode = _child_el_content(node, 'marketvercode')
-                    for p in node.getElementsByTagName('package'):
-                        if _child_el_content(p, 'versioncode') == marketvercode:
-                            return ApkRelease(
-                                _child_el_content(p, 'version'),
-                                int(marketvercode),
-                                '{}/{}'.format(repo, _child_el_content(p, 'apkname'))
-                            )
-        raise Exception('Did not find {} in repo {}'.format(application_id, repo))
+            if (
+                event == pulldom.START_ELEMENT
+                and node.tagName == 'application'
+                and node.getAttribute('id') == application_id
+            ):
+                doc.expandNode(node)
+                marketvercode = _child_el_content(node, 'marketvercode')
+                for p in node.getElementsByTagName('package'):
+                    if _child_el_content(p, 'versioncode') == marketvercode:
+                        return ApkRelease(
+                            _child_el_content(p, 'version'),
+                            int(marketvercode),
+                            f"{repo}/{_child_el_content(p, 'apkname')}",
+                        )
+        raise Exception(f'Did not find {application_id} in repo {repo}')

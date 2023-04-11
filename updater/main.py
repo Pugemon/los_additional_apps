@@ -11,17 +11,19 @@ def update_if_needed(module: str, release: ApkRelease):
     with open(path.join(module_dir, '.version_code'), 'r+') as version_code_file:
         version_code = int(version_code_file.read())
         if version_code < release.version_code:
-            print('updating {} to {}'.format(module, release.version_name))
-            apk_filename = path.join(module_dir, '{}.apk'.format(module))
+            print(f'updating {module} to {release.version_name}')
+            apk_filename = path.join(module_dir, f'{module}.apk')
 
             old_sig = certificates.get_apk_certificate(apk_filename)
 
-            print('downloading {} ...'.format(release.download_url))
+            print(f'downloading {release.download_url} ...')
             urllib.request.urlretrieve(release.download_url, apk_filename)
 
             new_sig = certificates.get_apk_certificate(apk_filename)
             if old_sig != new_sig:
-                raise Exception('Signature mismatch for {} old sig: {} new sig: {}'.format(module, old_sig, new_sig))
+                raise Exception(
+                    f'Signature mismatch for {module} old sig: {old_sig} new sig: {new_sig}'
+                )
 
             version_code_file.seek(0)
             version_code_file.write(str(release.version_code))
@@ -29,12 +31,14 @@ def update_if_needed(module: str, release: ApkRelease):
             version_code_file.close()
 
             print('commit and push...')
-            git.add_commit_push(module_dir, 'Update {} to {}'.format(module, release.version_name))
+            git.add_commit_push(module_dir, f'Update {module} to {release.version_name}')
 
         elif version_code > release.version_code:
-            print('{} ahead of suggested version ({} > {})'.format(module, version_code, release.version_code))
+            print(
+                f'{module} ahead of suggested version ({version_code} > {release.version_code})'
+            )
         elif version_code == release.version_code:
-            print('{} up to date.'.format(module))
+            print(f'{module} up to date.')
 
 fdroid_main_repo = 'https://www.f-droid.org/repo'
 
